@@ -32,7 +32,9 @@ namespace Gomoku
         private const double StoneSize = 10;
         private readonly Brush GridColor = Brushes.SaddleBrown;
         private int counter = 0;
-        private char[,] grid = new char[15, 15];
+        private char[,] grid = new char[GRID, GRID];
+        private MediaPlayer player = new MediaPlayer();
+        private int p1score = 0, p2score = 0;
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -42,8 +44,18 @@ namespace Gomoku
             FillGridCells();
             DrawGridLines();
             AddClickAreas();
+            PlayBackground();
         }
 
+        private void PlayBackground()
+        {
+            player.Open(new Uri("Assets/background.mp3", UriKind.Relative));
+            player.MediaEnded += (s, e) => {
+                player.Position = TimeSpan.Zero; // Loop
+                player.Play();
+            };
+            player.Play();
+        }
         private void FillGridCells()
         {
             double step = (CANVAS_SIZE - 2 * MARGIN) / (GRID - 1);
@@ -158,7 +170,15 @@ namespace Gomoku
 
             if (Check(grid, stone))
             {
-                MessageBox.Show($"Player {(stone == 'b' ? "1" : "2")} won");
+                string winner = stone == 'b' ? "1" : "2";
+                MessageBox.Show($"Player {winner} won");
+                if (winner == "1")
+                {
+                    p1score++;
+                } else
+                {
+                    p2score++;
+                }
             }
         }
 
@@ -211,6 +231,27 @@ namespace Gomoku
                 }
             }
             return false;
+        }
+
+        private void Restart_Click(object sender, RoutedEventArgs e)
+        {
+            // Reset the grid
+            grid = new char[GRID, GRID];
+
+            // Reset all Ellipses back to transparent
+            foreach (var child in stoneCanvas.Children)
+            {
+                if (child is Ellipse ellipse && ellipse.Name.StartsWith("B"))
+                {
+                    ellipse.Fill = Brushes.Transparent;
+                }
+            }
+
+            // Reset the game round
+            counter = 0;
+
+            p1Score.Text = $"{p1score}";
+            p2Score.Text = $"{p2score}";
         }
     }
 }

@@ -9,7 +9,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Assets\" />
+    <None Remove="Assets\background.mp3" />
+    <None Remove="Assets\desk.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\background.mp3">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\desk.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
