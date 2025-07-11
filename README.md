@@ -7,6 +7,6 @@
 traditional Gomoku design meets C#, and that is lightning fast⚡
 Special pick relaxing music to enjoy the win
 
-![Screenshot of the game](/Assets/game.png)
+![Screenshot of the game](Gomoku/Assets/game.png)
 
 Feel free to raise a PR or let me know if you want any improvements!
