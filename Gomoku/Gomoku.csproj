@@ -11,14 +11,18 @@
   <ItemGroup>
     <None Remove="Assets\background.mp3" />
     <None Remove="Assets\desk.png" />
+    <None Remove="Assets\gomoku.ico" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="Assets\background.mp3">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\desk.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\gomoku.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 

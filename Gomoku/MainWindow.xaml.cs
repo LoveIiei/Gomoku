@@ -133,7 +133,7 @@ namespace Gomoku
                         Height = StoneSize,
                         Fill = Brushes.Transparent,
                         Cursor = Cursors.Hand,
-                        Name = $"B{row}{col}",
+                        Tag = new Point(col, row),
                     };
 
                     clickArea.MouseLeftButtonDown += OnGridButtonClick;
@@ -151,6 +151,16 @@ namespace Gomoku
         private void OnGridButtonClick(object sender, RoutedEventArgs e)
         {
             Ellipse btn = sender as Ellipse;
+            Point coords = (Point)btn.Tag;
+            int col = (int)coords.X;
+            int row = (int)coords.Y;
+
+            // Check if a stone is already placed here
+            if (grid[row, col] != '\0')
+            {
+                MessageBox.Show("This spot is already taken!");
+                return;
+            }
             char stone;
             if (counter % 2 == 0)
             {
@@ -162,9 +172,6 @@ namespace Gomoku
                 btn.Fill = Brushes.White;
                 stone = 'w';
             }
-            string name = btn.Name;
-            int row = (int)Char.GetNumericValue(name[1]);
-            int col = (int)Char.GetNumericValue(name[2]);
             grid[row, col] = stone;
             counter++;
 
@@ -182,56 +189,57 @@ namespace Gomoku
             }
         }
 
-        private bool Check(char[,] nums, char symbol)
+        private bool Check(char[,] board, char symbol)
         {
             for (int row = 0; row < GRID; row++)
             {
                 for (int col = 0; col < GRID; col++)
                 {
-                    // Check vertical
-                    if (row <= GRID - 5 && grid[row, col] == symbol
-                        && grid[row+1, col] == symbol
-                        && grid[row + 2, col] == symbol
-                        && grid[row + 3, col] == symbol
-                        && grid[row + 4, col] == symbol)
-                    {
-                        return true;
-                    }
+                    if (board[row, col] != symbol)
+                        continue;
 
-                    //Check Horizontal
-                    if (col <= GRID - 5 && grid[row, col] == symbol
-                        && grid[row, col+1] == symbol
-                        && grid[row, col+2] == symbol
-                        && grid[row, col+3] == symbol
-                        && grid[row, col+4] == symbol)
-                    {
-                        return true;
-                    }
-
-                    if (row <= GRID - 5 && col <=GRID - 5
-                        && grid[row, col] == symbol
-                        && grid[row + 1, col + 1] == symbol
-                        && grid[row + 2, col + 2] == symbol
-                        && grid[row + 3, col + 3] == symbol
-                        && grid[row + 4, col + 4] == symbol)
-                    {
-                        return true;
-                    }
-
-
-                    if (row <= GRID - 5 && col >= 4
-                        && grid[row, col] == symbol
-                        && grid[row + 1, col - 1] == symbol
-                        && grid[row + 2, col - 2] == symbol
-                        && grid[row + 3, col - 3] == symbol
-                        && grid[row + 4, col - 4] == symbol)
-                    {
-                        return true;
-                    }
+                    // Check all 4 directions from current point
+                    if (CountConsecutive(board, row, col, 0, 1, symbol) >= 5) return true; // →
+                    if (CountConsecutive(board, row, col, 1, 0, symbol) >= 5) return true; // ↓
+                    if (CountConsecutive(board, row, col, 1, 1, symbol) >= 5) return true; // ↘
+                    if (CountConsecutive(board, row, col, 1, -1, symbol) >= 5) return true; // ↙
                 }
             }
             return false;
         }
+
+        private int CountConsecutive(char[,] board, int row, int col, int dRow, int dCol, char symbol)
+        {
+            int count = 1;
+
+            // Forward direction
+            int r = row + dRow;
+            int c = col + dCol;
+            while (IsInside(r, c) && board[r, c] == symbol)
+            {
+                count++;
+                r += dRow;
+                c += dCol;
+            }
+
+            // Backward direction
+            r = row - dRow;
+            c = col - dCol;
+            while (IsInside(r, c) && board[r, c] == symbol)
+            {
+                count++;
+                r -= dRow;
+                c -= dCol;
+            }
+
+            return count;
+        }
+
+        private bool IsInside(int row, int col)
+        {
+            return row >= 0 && row < GRID && col >= 0 && col < GRID;
+        }
+
 
         private void Restart_Click(object sender, RoutedEventArgs e)
         {
@@ -241,7 +249,7 @@ namespace Gomoku
             // Reset all Ellipses back to transparent
             foreach (var child in stoneCanvas.Children)
             {
-                if (child is Ellipse ellipse && ellipse.Name.StartsWith("B"))
+                if (child is Ellipse ellipse && ellipse.Tag is Point)
                 {
                     ellipse.Fill = Brushes.Transparent;
                 }
